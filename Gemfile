@@ -3,12 +3,14 @@ source 'http://rubygems.org'
 gem 'rails', '3.1.0'
 gem 'pg'
 gem 'gravatar_image_tag'
+gem 'jquery-rails'
 
 
 group :development do
   gem 'rspec-rails', '2.6.1'
   gem 'annotate', '2.4.0'
   gem 'sqlite3', '1.3.4'
+  gem 'faker'
 end
 
 group :test do

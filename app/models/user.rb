@@ -13,6 +13,8 @@ class User < ActiveRecord::Base
   attr_accessible :name, :email, :password, :password_confirmation
   attr_accessor :password
 
+  has_many :microposts, :dependent => :destroy
+
   email_regex = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
 
   validates :name, :presence => true,
@@ -30,13 +32,19 @@ class User < ActiveRecord::Base
 
   def has_password?(submitted_password)
     encrypted_password == encrypt(submitted_password)
-
-    def self.authenticate(email, submitted_password)
-      user = find_by_email(email)
-      return nil if user.nil?
-      return user if user.has_password?(submitted_password)
-    end
   end
+
+  def self.authenticate(email, submitted_password)
+    user = find_by_email(email)
+    return nil if user.nil?
+    return user if user.has_password?(submitted_password)
+  end
+
+  def feed
+    # This is preliminary. See Chapter 12 for the full implementation.
+    Micropost.where("user_id = ?", id)
+  end
+
 
   private
 
@@ -56,4 +64,16 @@ class User < ActiveRecord::Base
   def secure_hash(string)
     Digest::SHA2.hexdigest(string)
   end
+
+  def self.authenticate(email, submitted_password)
+    user = find_by_email(email)
+    return nil if user.nil?
+    return user if user.has_password?(submitted_password)
+  end
+
+  def self.authenticate_with_salt(id, cookie_salt)
+    user = find_by_id(id)
+    (user && user.salt == cookie_salt) ? user : nil
+  end
+
 end
